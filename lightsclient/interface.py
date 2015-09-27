@@ -5,7 +5,8 @@ Created on Sep 24, 2015
 '''
 
 from os.path import expanduser, isdir, exists
-from xml.dom import minidom
+from xml.etree import ElementTree
+from music21 import converter
 
 class Interface(object):
     '''
@@ -68,6 +69,21 @@ class Interface(object):
         data = songPath + "data.xml"
         gp = songPath + "gp.xml"
         
-        datadoc = minidom.parse(data)
-        MPtrack = datadoc.getElementsByTagName("mpTrack")
+        MPTrack = None
+        inputTracks = []
+        outputTracks = []
+        
+        tree = ElementTree.parse(data)
+        
+        """ populate MPTrack, inputTracks, and outputTracks """
+        for elem in tree.iterfind("mpTrack"):
+            MPTrack = int(elem.text)           
+        
+        for elem in tree.iterfind("inputTrack"):
+            inputTracks.append(int(elem.text))
+            
+        for elem in tree.iterfind("outputTrack"):
+            outputTracks.append(int(elem.text))
+        
+        """ parse gp.xml """
         
