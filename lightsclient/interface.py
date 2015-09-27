@@ -86,4 +86,5 @@ class Interface(object):
             outputTracks.append(int(elem.text))
         
         """ parse gp.xml """
+        song = converter.parse(gp)
         
