@@ -22,39 +22,39 @@ class Interface(object):
         global lightsPath
         lightsPath = expanduser("~") + "/PA/Lights Files/"
 
-    """Get user input"""    
+    """ Get user input """    
     def getInput(self, song=None):
         songPath = lightsPath + "Songs/"
         
         if song != None:
             song = songPath + song
-            """Check if correct input"""
+            """ Check if correct input """
             if isdir(song):
                     
-                """Check for data.xml and gp.xml"""
+                """ Check for data.xml and m.mid """
                 dataExists = exists(song + "data.xml")
                 mExists = exists(song + "m.mid")
                 if dataExists and mExists:
                     return song
                 
                 
-        """Get user input"""
+        """ Get user input """
         songPath = songPath + input('Enter title of song: ') + "/"
         
-        """Check if song folder exists"""
+        """ Check if song folder exists """
         if not isdir(songPath):
             songExists = False
             
-            """While loop, exits when user inputs song that exists"""
+            """ While loop, exits when user inputs song that exists """
             while not songExists:
                
-                """Get user input"""
+                """ Get user input """
                 songPath = lightsPath + input('Enter title of song: ') + "/"
                 
-                """Check if correct input"""
+                """ Check if correct input """
                 if isdir(songPath):
                     
-                    """Check for data.xml and gp.xml"""
+                    """ Check for data.xml and m.mid """
                     dataExists = exists(songPath + "data.xml")
                     mExists = exists(songPath + "m.mid")
                     
@@ -62,7 +62,7 @@ class Interface(object):
                         songExists = True
         
         
-        """Return songPath after correct input recieved"""
+        """ Return songPath after correct input received """
         return songPath
     
     

@@ -2,10 +2,11 @@ import sys
 from ctypes import cdll, byref, create_string_buffer
 from LightsClient.interface import Interface
 from LightsClient.ALSA import ALSA
+from LightsClient.args import ArgsParser
 
 def main(args=None):
     
-    """Set process name"""
+    """ Set process name """
     name = "Lights Client"
     length = len(name)
     libc = cdll.LoadLibrary('libc.so.6')
@@ -13,9 +14,9 @@ def main(args=None):
     buff.value = bytes(name, 'utf8')
     libc.prctl(15, byref(buff), 0, 0, 0)
     
-    """Main routine"""
-    if args is None:
-        args = sys.argv[1:]
+    """ Parse arguments """
+    argsParser = ArgsParser()
+    argsParser.parse()
         
     print("Starting")
     

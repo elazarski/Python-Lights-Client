@@ -7,7 +7,9 @@ from alsamidi import *
 
 class ALSA(object):
     '''
-    classdocs
+    Deals with ALSA sequencer
+        Starts/Stops Sequencer
+        Starts/Stops threads
     '''
 
 
