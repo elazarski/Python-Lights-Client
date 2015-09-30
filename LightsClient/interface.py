@@ -89,7 +89,6 @@ class Interface(object):
         
         """ parse m.mid """
         song = converter.parse(m)
-        song.show()
         
         inputData = []
         outputData = []

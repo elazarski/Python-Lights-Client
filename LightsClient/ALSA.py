@@ -25,7 +25,11 @@ class ALSA(object):
         print("ALSA Sequencer closed")
         
     """ Function to play a song.
-    This method creates I/O threads """
+    This method creates I/O threads
+    and waits for them to finish """
     def playSong(self, data):
-        data[0][0].show('text')
+        inputData = data[0]
+        outputData = data[1]
+        mpData = data[2]
+        
         
