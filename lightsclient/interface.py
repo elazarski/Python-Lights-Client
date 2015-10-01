@@ -26,8 +26,8 @@ class Interface(object):
     def getInput(self, song=None):
         songPath = lightsPath + "Songs/"
         
-        if song != None:
-            song = songPath + song
+        if song is not None:
+            song = songPath + song + "/"
             """ Check if correct input """
             if isdir(song):
                     
@@ -79,17 +79,18 @@ class Interface(object):
         
         """ populate MPTrack, inputTracks, and outputTracks """
         for elem in tree.iterfind("mpTrack"):
-            MPTrack = int(elem.text)           
+            MPTrack = int(elem.text) - 1           
         
         for elem in tree.iterfind("inputTrack"):
-            inputTracks.append(int(elem.text))
+            inputTracks.append(int(elem.text) - 1)
             
         for elem in tree.iterfind("outputTrack"):
-            outputTracks.append(int(elem.text))
+            outputTracks.append(int(elem.text) - 1)
+        
         
         """ parse m.mid """
         song = converter.parse(m)
-        
+
         inputData = []
         outputData = []
         MPData = None
@@ -104,6 +105,25 @@ class Interface(object):
                     outputData.append(song.parts[i])
             if i == MPTrack:
                 MPData = song.parts[i]
+
         
-        
+        """ Return data """
         return [inputData, outputData, MPData]
+    
+    def parseSetlist(self, setlist):
+        setlistPath = lightsPath + "Setlists/"
+        
+        songs = []
+        
+        """ check just to make sure """
+        if isdir(setlistPath):
+            filePath = setlistPath + setlist + ".xml"
+            
+            if exists(filePath):
+                tree = ElementTree.parse(filePath)
+                for song in tree.iterfind("song"):
+                    songs.append(song.text)
+                
+            
+        """ Return data """
+        return songs
