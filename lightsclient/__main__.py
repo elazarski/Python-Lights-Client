@@ -1,18 +1,13 @@
 import sys
-from ctypes import cdll, byref, create_string_buffer
 from lightsclient.ALSA import ALSA
 from lightsclient.args import ArgsParser
 from lightsclient.interface import Interface
+import setproctitle
 
 def main(args=None):
     
     """ Set process name """
-    name = "Lights Client"
-    length = len(name)
-    libc = cdll.LoadLibrary('libc.so.6')
-    buff = create_string_buffer(length+1)
-    buff.value = bytes(name, 'utf8')
-    libc.prctl(15, byref(buff), 0, 0, 0)
+    setproctitle("Lights Client")
     
     """ Parse arguments """
     argsParser = ArgsParser()
@@ -22,8 +17,8 @@ def main(args=None):
     sequencer = ALSA()
     
     if args:
-        num, str = args
-        playWithArgs(num, str, sequencer)
+        num, title = args
+        playWithArgs(num, title, sequencer)
     else:
         playNoArgs(sequencer)
     
@@ -33,7 +28,7 @@ def main(args=None):
     sys.exit(0)
     
     """ Continues based on arguments """
-def playWithArgs(num, str, sequencer):
+def playWithArgs(num, title, sequencer):
     
     """ Initialize interface """
     i = Interface()
@@ -41,12 +36,12 @@ def playWithArgs(num, str, sequencer):
     """ Check arguments """
     if num == 0:
         """ song """
-        songPath = i.getInput(str)
+        songPath = i.getInput(title)
         data = i.parseFiles(songPath)
         sequencer.playSong(data)
     elif num == 1:
         """ setlist """
-        songs = i.parseSetlist(str)
+        songs = i.parseSetlist(title)
         
         """ Load and play each song in songs """
         for song in songs:

@@ -4,8 +4,7 @@ Created on Sep 28, 2015
 @author: eric
 '''
 from alsamidi import *
-from threading import Thread, Condition
-from music21 import *
+from multiprocessing import process
 from queue import Queue
 
 class ALSA(object):
@@ -39,33 +38,36 @@ class ALSA(object):
         outputData = data[1]
         mpData = data[2]
         
-        threads = []
-        inputConditions = []
-        outputConditions = []
-        
-        """ Start input Threads """
+        """ Create I/O Processes """
+        processes = []
         for i in inputData:
-            t = Thread(target=self.inThreadFunc, args=(inputData, mpData))
-            threads += [t]
-            t.start()
-            
-        """ Start output threads """
+            p = process(target=self.inPFunc, args=(i, mpData))
+            processes += [p]
+            p.start()
+        
         for o in outputData:
-            t = Thread(target=self.outThreadFunc, args=(o, mpData))
-            threads += [t]
-            t.start()
+            p = process(target=self.outPFunc, args=(o, mpData))
+            processes += [p]
+            p.start()
+        
+        
+        for p in processes:
+            p.join()
             
-        """ Join threads in the end """
-        for t in threads:
-            t.join()       
             
+    """ Input Process function """
+    def inPFunc(self, track, mpData):
+        print("input process started")
+        for i in range(0, 10000):
+            i*i
+            
+        print("input process done")
         
-    """ Input Thread function """
-    def inThreadFunc(self, track, mpData):
-        print("input thread")
         
-        
-        
-    """ Output Thread function """
-    def outThreadFunc(self, track, mpData):
+    """ Output Process function """
+    def outPFunc(self, track, mpData):
         print("output thread")
+        for i in range(0, 10000):
+            i*i
+            
+        print("output process done")
