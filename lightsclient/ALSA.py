@@ -4,8 +4,7 @@ Created on Sep 28, 2015
 @author: eric
 '''
 from alsamidi import *
-from multiprocessing import process
-from queue import Queue
+from multiprocessing import Process, current_process, Pipe  # @UnresolvedImport
 
 class ALSA(object):
     '''
@@ -38,17 +37,29 @@ class ALSA(object):
         outputData = data[1]
         mpData = data[2]
         
+        numInputTracks = len(inputData)
+        numOutputTracks = len(outputData)
+        
+        
         """ Create I/O Processes """
         processes = []
+        parent_connections = []
+        
         for i in inputData:
-            p = process(target=self.inPFunc, args=(i, mpData))
-            processes += [p]
+            pConnection, cConnection = Pipe()
+            p = Process(name="I{}".format(len(processes)), target=self.inPFunc, args=(i, mpData, cConnection))
+            processes.append(p)
             p.start()
+            parent_connections.append(pConnection)
+        
+        
         
         for o in outputData:
-            p = process(target=self.outPFunc, args=(o, mpData))
+            pConnection, cConnection = Pipe()
+            p = Process(name="O{}".format(len(processes)-numInputTracks), target=self.outPFunc, args=(o, mpData, cConnection))
             processes += [p]
             p.start()
+            parent_connections.append(pConnection)
         
         
         for p in processes:
@@ -56,18 +67,22 @@ class ALSA(object):
             
             
     """ Input Process function """
-    def inPFunc(self, track, mpData):
-        print("input process started")
-        for i in range(0, 10000):
-            i*i
+    def inPFunc(self, track, mpData, conn):
+        print(current_process().name)
+        num = 0
+        for i in range(0, 1000000):
+            num += i*i
             
-        print("input process done")
+        print(num)
+        print(current_process().name, "done")
         
         
     """ Output Process function """
-    def outPFunc(self, track, mpData):
-        print("output thread")
-        for i in range(0, 10000):
-            i*i
+    def outPFunc(self, track, mpData, conn):
+        print(current_process().name)
+        num = 0
+        for i in range(0, 1000000):
+            num += i*i
             
-        print("output process done")
+        print(num)
+        print(current_process().name, "done")

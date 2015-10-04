@@ -2,7 +2,7 @@ import sys
 from lightsclient.ALSA import ALSA
 from lightsclient.args import ArgsParser
 from lightsclient.interface import Interface
-import setproctitle
+from setproctitle import setproctitle
 
 def main(args=None):
     
