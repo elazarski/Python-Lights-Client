@@ -3,9 +3,9 @@ Created on Sep 28, 2015
 
 @author: eric
 '''
-from alsamidi import *
+from alsamidi import *  # @UnusedWildImport
 from multiprocessing import Process, current_process, Pipe  # @UnresolvedImport
-
+from music21 import note, chord
 class ALSA(object):
     '''
     Deals with ALSA sequencer
@@ -35,31 +35,49 @@ class ALSA(object):
     def playSong(self, data):
         inputData = data[0]
         outputData = data[1]
-        mpData = data[2]
+        mpData = data[2]        
         
+        """ Create I/O Processes """
         numInputTracks = len(inputData)
         numOutputTracks = len(outputData)
         
-        
-        """ Create I/O Processes """
         processes = []
-        parent_connections = []
+        inputConnections = []
+        outputConnections = []
         
         for i in inputData:
             pConnection, cConnection = Pipe()
-            p = Process(name="I{}".format(len(processes)), target=self.inPFunc, args=(i, mpData, cConnection))
+            p = Process(name="I{}".format(len(processes)), target=self.inPFunc, args=(i.notes, mpData.notes, cConnection))
             processes.append(p)
             p.start()
-            parent_connections.append(pConnection)
-        
-        
+            inputConnections.append(pConnection)
+           
         
         for o in outputData:
             pConnection, cConnection = Pipe()
-            p = Process(name="O{}".format(len(processes)-numInputTracks), target=self.outPFunc, args=(o, mpData, cConnection))
+            p = Process(name="O{}".format(len(processes)-numInputTracks), target=self.outPFunc, args=(o.notes, mpData.notes, cConnection))
             processes += [p]
             p.start()
-            parent_connections.append(pConnection)
+            outputConnections.append(pConnection)
+        
+        
+        """ Main loop """
+        while True:
+            ev = alsaseq.input()
+            
+            """ This checks if noteon """
+            if ev[0] == 6:
+                
+                """ Checks if key in or control in """
+                if ev[6][1] == 0:
+                    
+                    """ Make sure channel is expected, otherwise ignore """
+                    if ev[7][0] <= numInputTracks:
+                        inputConnections[ev[7][0]].send(ev[7][1])
+                        
+                else:
+                    """ control in """ 
+                    print("Control recieved event:", ev)
         
         
         for p in processes:
@@ -68,21 +86,26 @@ class ALSA(object):
             
     """ Input Process function """
     def inPFunc(self, track, mpData, conn):
-        print(current_process().name)
-        num = 0
-        for i in range(0, 1000000):
-            num += i*i
+        print(current_process().name, "started")
+        
+        """ Declare necessary variables """
+        currentNote = 0
+        currentPart = 0
+        currentMeasure = 0
+        songDone = False
+        
+        """ Main loop """
+        while not songDone:
             
-        print(num)
+            """ get data from main process """
+            ev = conn.recv()
+            
+        
         print(current_process().name, "done")
         
         
     """ Output Process function """
     def outPFunc(self, track, mpData, conn):
-        print(current_process().name)
-        num = 0
-        for i in range(0, 1000000):
-            num += i*i
-            
-        print(num)
+        print(current_process().name, "started")
+        
         print(current_process().name, "done")
