@@ -6,10 +6,10 @@ from setproctitle import setproctitle
 
 def main(args=None):
     
-    """ Set process name """
+    # Set process name
     setproctitle("Lights Client")
     
-    """ Parse arguments """
+    # Parse arguments
     argsParser = ArgsParser()
     args = argsParser.parse()
     
@@ -22,47 +22,47 @@ def main(args=None):
     else:
         playNoArgs(sequencer)
     
-    """ Close ALSA Sequencer """
+    # Close ALSA Sequencer
     sequencer.close()
     
     sys.exit(0)
     
-    """ Continues based on arguments """
+    # Continues based on arguments
 def playWithArgs(num, title, sequencer):
     
-    """ Initialize interface """
+    # Initialize interface
     i = Interface()
     
-    """ Check arguments """
+    # Check arguments
     if num == 0:
-        """ song """
+        # song
         songPath = i.getInput(title)
         data = i.parseFiles(songPath)
         sequencer.playSong(data)
     elif num == 1:
-        """ setlist """
+        # setlist
         songs = i.parseSetlist(title)
         
-        """ Load and play each song in songs """
+        # Load and play each song in songs
         for song in songs:
             songPath = i.getInput(song) 
             data = i.parseFiles(songPath)
             sequencer.playSong(data)
         
     
-    """ No arguments """
+    # No arguments
 def playNoArgs(sequencer):
  
-    """ Initialize interface """
+    # Initialize interface
     i = Interface()
     
-    """ Get user input """
+    # Get user input
     songPath = i.getInput()
     
-    """ parse data """
+    # parse data
     data = i.parseFiles(songPath)
     
-    """ play the song """
+    # play the song
     sequencer.playSong(data)
     
     
